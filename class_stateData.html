@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root">
+    <h1 id="title"></h1>
+    <button id="update-button">제목 변경</button>
+  </div>
+  <script>
+    // state : 곳간에 물건을 보관하는 것처럼 데이터를 관리할 객체로 만들어서 관리
+    // 아래의 stateData 객체 선언을 브라우저가 읽는 순간 메모리 어딘가에 존재하는 주소를 할당 받음
+    let stateData = {
+      basicTitle : "기본 제목",
+      newtitle : "새로운 제목"
+    }
+
+    // initialize
+    // 간단한 문서 식별
+    const h1 = document.getElementById("title");
+    const button = document.getElementById("updated-button")
+
+    /**
+     * @param {HTMLelement} domElement
+     * return {void}
+     * void === return 없음
+     * updateUI 함수는 domElement 라는 매개변수(h1)를 받음
+     */
+    function updateUI (domElement){
+      domElement.textContent = stateData.basicTitle;
+    };
+
+    function updateTitle(setNewTitle){
+      stateData.basicTitle = setNewTitle;
+      // updateUI 함수 호출 -> updateTitle 함수는 updateUI를 호출하는 것까지 책임
+      updateUI(h1);
+      // updateUI는 textContent를 변경하는 함수
+    }
+    // 최초 한번 (최초 접속 혹은 GET 요청)을 위해 한번은 실행
+    updateUI(h1)
+
+    // 이벤트 리스너 추가
+    button.addEventListener("click", function(){
+      // 버튼 클릭 시 stateData에 마련된 함수가 연결되어 결국 h1 데이터는 새로운 값으로 전환
+      updateTitle(stateData.setNewTitle);
+    });
+  </script>
+</body>
+</html>
