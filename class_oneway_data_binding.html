@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root">
+    <input type="text" id="test-input" placeholder="여기에 입력하세요" />
+    <p id="display-text">여기에 입력된 내용들이 표시됩니다.</p>
+  </div>
+  <script>
+    let stateData={
+      text : ""
+    };
+
+    const inputField = document.getElementById("test-input");
+    const displayText = document.getElementById("display-text");
+
+    // 입력 필드에 입력할 때마다 데이터 객체 및 표시 영역 업데이트
+    inputField.addEventListener("input", function(event){
+      // input 이벤트 때문에 입력이 일어나는 것에서 이벤트가 계속 발생
+      // DOM API의 event object에 대해 복습할 것
+      stateData.text = event.target.value;
+      updateDisplay();
+    });
+
+    function updateDisplay(){
+      displayText.textContent = stateData.text;
+    };
+
+    // 초기 표시 영역 업데이트
+    updateDisplay();
+  </script>
+</body>
+</html>
