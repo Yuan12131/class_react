@@ -9,11 +9,16 @@
   <div id="root"></div>
   <script>
     // 가상 DOM 요소를 생성하는 함수
+		/**
+     * * type = 타입 (태그)
+     * * props = 요소의 속성 ('href','classname'등 | react 컴포넌트에 전달되는 속성)
+     * * ...children = 전개연산자 : 나머지 매개변수 (자식요소)
+    */
     function createElement(type, props, ...children) {
       return { type, props, children };
     }
 
-    // 간단한 컴포넌트를 정의하는 함수
+    // 컴포넌트를 정의하는 함수
     function component(stateData) {
       const menuItems = [];
 
@@ -51,7 +56,8 @@
       }
       return element;
     }
-
+		
+		// 상태 데이터 정의
     const stateDate = [
       { hash : '#home', text : 'Home'},
       { hash : '#about', text : 'About'},
