@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>문서</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // 가상 DOM 요소를 생성하는 함수
+    function createElement(type, props, ...children) {
+      return { type, props, children };
+    }
+
+    // 간단한 컴포넌트를 정의하는 함수
+    function component(stateData) {
+      const menuItems = [];
+
+      // 상태 데이터를 순회하면서 목록 항목에 대한 앵커 태그를 포함한 리스트 아이템을 생성
+      for (let i = 0; i < stateData.length; i++) {
+        const item = stateData[i];
+        // <li> <a href=item.hash>item.text</a> </li> 의 형태
+        const menuItem = createElement('li', {}, createElement('a', { href: item.hash }, item.text));
+        menuItems.push(menuItem);
+      }
+
+      // 가상 DOM 구조 생성
+      const menu = createElement('ul', {}, ...menuItems);
+      const content = createElement('div', {}, '안녕하세요 React');
+      return createElement('div', {}, menu, content);
+    }
+
+    // 가상 DOM을 실제 DOM으로 변환하는 함수
+    function render(virtualDom) {
+      if (typeof virtualDom === "string") {
+        // 새로운 TextNode 객체를 생성
+        return document.createTextNode(virtualDom);
+      }
+      const element = document.createElement(virtualDom.type);
+
+      if (virtualDom.props) {
+        // virtualDom.props 객체의 각 키-값 쌍을 반복하면서 setAttribute를 사용하여 속성을 설정
+        for (const [key, value] of Object.entries(virtualDom.props)) {
+          element.setAttribute(key, value);
+        }
+      }
+      for (let i = 0; i < virtualDom.children.length; i++) {
+        const child = virtualDom.children[i];
+        element.appendChild(render(child));
+      }
+      return element;
+    }
+
+    const stateDate = [
+      { hash : '#home', text : 'Home'},
+      { hash : '#about', text : 'About'},
+      { hash : '#services', text : 'Services'},
+      { hash : '#portfolio', text : 'Portfolio'},
+      { hash : '#contact', text : 'Contact'},
+    ]
+
+    // 컴포넌트에 상태 데이터 전달하여 가상 DOM 생성
+    const virtualDom = component(stateData);
+
+    // 실제 DOM에 가상 DOM을 추가하는 부분
+    const container = document.getElementById("root");
+    container.appendChild(render(virtualDom));
+  </script>
+</body>
+</html>
