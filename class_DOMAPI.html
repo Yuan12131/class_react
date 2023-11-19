@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="root">
+
+  </div>
+
+  <script>
+    /**
+     * createElementExample 함수는 가상 DOM 요소 생성
+     * 
+     * @param {string} type - 생성할 요소 타입 (예 : 'div', 'h1' 등)
+     * @param {Object} properties - 요소의 속성 (예 : {id : 'app'})
+     * @param {Array} children - 자식 요소들 (문자열 또는 객체)
+     * @returns {Object} 생성된 가상 요소의 DOM
+     */
+    function createElementExample(type, properties, children) {
+      // 자식 요소들을 DOM 요소로 반환
+      const props = {
+        children: children.map(child => {
+          // children 요소가 객체일 때는 return, 아닐 때는 본 함수 호출 (재귀함수)
+          // 객체가 아닌 경우 텍스트를 가진 가상 DOM 요소 생성
+          // 어려운 코드 테크닉 -> 태그가 아닌 기본형태로 연습할 것
+          if (typeof child === "object") {
+            return child
+          } else {
+            return createTextExample(child)
+          }
+        }),
+      };
+
+      // 속성 복사
+      if (properties) {
+        // 객체 반복문 for.. in
+        for (const key in properties) {
+          if (properties.hasOwnProperty(key)) {
+            // 프로퍼티를 가지고 있는지 검사하는 편리한 메서드
+            props[key] = properties[key];
+          }
+        }
+      }
+      return {
+        type: type,
+        props: props,
+      };
+    }
+
+    /**
+     * createTextExample 함수는 텍스트를 가진 가상 DOM 요소 생성
+     * 
+     * @param {String} text - 텍스트 내용
+     * @param {Object} 텍스트를 가진 가상 DOM 요소
+     */
+    function createTextExample(text) {
+      return {
+        type: "TEXT_ELEMENT", // DOM API의 코어, 인터페이스인 Node(요소마다)의 타입
+        props: {
+          nodeValue: text,
+          children: [],
+        },
+      };
+    }
+
+    /**
+     * render 함수는 가상 DOM 함수를 실제 DOM 함수로 렌더링 
+     * 
+     * @param {Object} virtualDOM - 렌더링 할 가상 DOM
+     * @param {HTMLElement} container - 렌더링 될 실제 DOM 요소의 컨테이너
+     */
+
+    /**
+     * ! 속성 설정: render 함수 내에서는 가상 DOM 요소의 props 객체에 있는 속성들을 실제 DOM 요소에 설정
+     * 이 속성들은 해당 DOM 요소의 특성을 나타냄
+     * 예를 들어, id, className, nodeValue 등이 해당될 수 있음
+     * 이렇게 설정된 속성들은 생성된 실제 DOM에 반영되어 렌더링 됨
+     * ! 자식 요소들의 재귀적 렌더링: props 객체 안에 있는 children 배열은 현재 가상 DOM 요소의 자식 요소들을 나타냄
+     *  render 함수는 이 배열을 순회하면서 각각의 자식에 대해 render 함수를 재귀적으로 호출
+     * 이 과정을 통해 각각의 자식 요소도 마찬가지로 실제 DOM으로 변환되고 부모 요소에 추가
+     * 
+     * !  "TEXT_ELEMENT" : 텍스트를 가진 가상 DOM 요소를 나타내는 특별한 타입을 의미
+     * React나 다른 가상 DOM을 다루는 라이브러리에서는 텍스트를 효과적으로 처리하기 위해 일반적인 DOM 요소와는 구분하기 위해 이런 특별한 타입을 사용
+    */
+    function render(virtualDOM, container) {
+      let domElement;
+      // virtualDOM의 타입이 "TEXT_ELEMENT"인 경우에는 텍스트 노드를 생성하고, 
+      // 그렇지 않은 경우에는 createElement 함수를 사용하여 요소를 생성
+      if (virtualDOM.type === "TEXT_ELEMENT") {
+        domElement = document.createTextNode("");
+      } else {
+        domElement = document.createElement(virtualDOM.type);
+      }
+
+      // 속성 설정
+      for (const key in virtualDOM.props) {
+        if (key !== "children") {
+          domElement[key] = virtualDOM.props[key];
+        }
+      }
+
+      // 자식 요소들을 재귀적으로 렌더링
+      // 자식 요소가 텍스트인 경우 렌더링하지 않고, 텍스트 노드 생성
+      virtualDOM.props.children.forEach(child => render(child, domElement));
+      container.appendChild(domElement);
+    }
+
+    // 애플리케이션의 루트 요소 생성
+    /**
+     * ? 거대한 React.js 라이브러리의 createElement 함수를 직접 풀어낸 코드이니, 세부적인 접근은 약간 다를 수 있으나, 기본적인 논리는 동일
+     * 따라서 해당 코드를 이해하는 것은 React.js의 코어를 이해하는 매우 중요한 개념
+     */
+    // createElementExample 함수를 사용하여 루트 요소인 <div>를 생성
+    // 이 <div>는 id가 "app"이고, 자식 요소로 <h1>과 <p>
+    const App = createElementExample(
+      "div",
+      { id: "app" },
+      [
+        createElementExample("h1", null, ["virtua DOM"]),
+        createElementExample("p", null, ["이것이 client-side rendering이다"]),
+      ]
+    );
+
+    // 가상 DOM 렌더링
+    // render 함수를 사용하여 App을 실제 DOM에 렌더링
+    render(App, document.getElementById("root"))
+    // 결과적으로 <div id="app"> <h1>virtual DOM</h1> <p>이것이 client-side rendering이다</p> </div>
+  </script>
+</body>
+
+</html>
