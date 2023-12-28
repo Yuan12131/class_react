@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root"></div>
+  <button id="addPackButton">Open!</button>
+  <script>
+    // 전역 상태 - 포켓몬 카드 팩의 수량
+    let globalState = {
+      packs: 10
+    };
+    /*
+    위 globalState 객체는 어디에서든 접근할 수 있는 전역 데이터로 가정
+    라이브러리를 사용하지 않는다면 JSON 파일을 불러와서 전역상태를 초기화(시작)할 수 있고,
+    일반적으로 라이브러리를 사용해, 전역상태 관리
+
+    위 개념은 React에서 useContext를 사용할 때, 전역 상태를 관리하는 방법과 동일
+    라이브러리로는 Redux, Recoil이 매우 대중적으로 사용
+    */
+  
+    // 카드 팩 컴포넌트 생성 함수
+    function createCardPack(index) {
+      const pack = document.createElement("div");
+      pack.id = `pack-${index}`;
+      pack.innerText = `Pack ${index + 1}`;
+      // 간단한 스타일링
+      pack.style.cursor = "pointer";
+      // 지역 상태 데이터
+      pack.isOpen = false;
+      /*
+      pack.isOpen은 pack이라는 DOM 객체에 동적으로 키(key) 하나를 추가한 것으로, React에서는 useState를 사용해 지역 상태 관리
+      if(pack.isOpen){} 부분이 useState() 메서드를 모방한 것으로 '단방향 데이터 바인딩'을 구현한 것
+      */
+
+      pack.addEventListener("click", () => {
+        if(pack.isOpen) {
+          pack.isOpen = false;
+        } else {
+          pack.isOpen = true;
+        }
+        // 위 if문에 따라 아래 if문이 실행
+        // 직접적으로 제어하는 것을 '양방향 데이터 바인딩' 방식이며 Vue.js가 채택한 방식이지만
+        // React는 어떤 상태, 여기에서는 isOpen이 변경되었는지를 감지하고
+        // 변경된 상태를 렌더링하는 방식으로 '단방향 데이터 바인딩'을 채택
+        if(pack.isOpen) {
+          pack.style.backgroundColor = "lightgreen";
+        } else {
+          pack.style.backgroundColor = "white";
+        }
+      });
+      return pack;
+    }
+
+    // 전역 상태를 기반으로 카드팩들을 렌더링하는 함수
+    function renderPacks(){
+      const root = document.getElementById("root");
+      root.innerHTML = ""; // 기존 팩들을 초기화
+      for (let i = 0; i < globalState.packs; i++) {
+        root.appendChild(createCardPack(i));
+      }
+    }
+
+    // 팩을 추가하는 함수
+    function addPack(){
+      globalState.packs++;
+      renderPacks();
+    }
+
+    // 문서 getting
+    const addPackButton = document.getElementById("addPackButton");
+    // 아래의 addPack 함수를 클릭 이벤트에 연결
+    addPackButton.addEventListener("click", addPack);
+
+    // 초기 렌더링
+    renderPacks();
+  </script>
+</body>
+</html>
